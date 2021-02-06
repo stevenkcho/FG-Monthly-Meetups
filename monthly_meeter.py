@@ -2,23 +2,21 @@ import json
 import random
 
 members = [
-    'Steven Cho',
-    'Patty Gao',
-    'Simon Ruiz',
-    'Michelle Zhang',
-    'Erika Sheng',
-    'Joon Yoo',
-    'Timothy Kang',
-    'Ellen Shi',
-    'Linda Fu',
     'Eugenia Kim',
-    'Stephen Lee',
-    'Nat Nah'
+    'Leslie Chou',
+    'Hyerine Kim',
+    'Patty Gao',
+    'Welton Li',
+    'Ellen Shi',
+    'Timothy Kang',
+    'Linda Fu',
+    'Adrian Choi',
+    'Daniel Lee',
+    'Simon Ruiz',
+    'Steven Cho'
 ]
 
-counts = {}
-
-def build_new_counts():
+def build_new_counts(counts):
     for m in members:
         if not counts.get(m):
             counts[m] = {}
@@ -31,16 +29,17 @@ def build_new_counts():
 def read_counts():
     with open('./counts.json') as counts_file:
         counts = json.load(counts_file)
+        return counts
 
-def randomize(num, group_size):
+def randomize(num, group_size, counts):
     attempts = []
     for n in range(num):
         randomized = members.copy()
         random.shuffle(randomized)
-        attempts.append(score_group([randomized[i:i + group_size] for i in range(0, len(randomized), group_size)]))
+        attempts.append(score_group([randomized[i:i + group_size] for i in range(0, len(randomized), group_size)], counts))
     return attempts
 
-def score_group(groups):
+def score_group(groups, counts):
     score = 0
     for group in groups:
         for person in group:
@@ -50,7 +49,7 @@ def score_group(groups):
                         score += counts[person].get(other, 0)
     return (score, groups)
 
-def update_counts(groups):
+def update_counts(groups, counts):
     for group in groups:
         for person in group:
             if not counts.get(person):
@@ -75,10 +74,10 @@ def pretty_print(groups):
             
 
 def main():
-    read_counts()
-    build_new_counts()
-    final_group = min(randomize(5, 3), key=lambda t: t[0])
-    update_counts(final_group[1])
+    counts = read_counts()
+    build_new_counts(counts)
+    final_group = min(randomize(5, 3, counts), key=lambda t: t[0])
+    update_counts(final_group[1], counts)
     pretty_print(final_group[1])
 
 if __name__ == '__main__':
